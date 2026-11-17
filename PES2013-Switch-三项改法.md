@@ -1,4 +1,4 @@
-# PES2013 上 Switch：改视角、边线、内存补丁
+# PES2013 上 Switch：改视角、边线
 
 适用：PES2013 1.00（pes2013.exe 19,969,024 字节）+ FEXTendo 0.4.2，emuMMC 系统，AMS 1.11.2 或 1.12.0。
 
@@ -161,14 +161,4 @@ dxvk.numCompilerThreads = 1
 >
 > 改完把三个文件传回卡，整份回读 sha256 与本地一致才算完。
 
-### 装内存补丁
 
-这一步 AI 只能做一半，装 `loader.kip` 得你在 Switch 上跑安装器。但版本对不对、文件在不在、ini 有没有写进去，可以让它先查清楚。
-
-> 还是刚才那个 DBI FTP 连接（192.168.x.x:5000，anonymous，根目录 = SD 卡）。帮我装 FEXTendo Patch（PES2013 兼容层的 loader 补丁）。只读优先，不确定的文件先备份再动，每一步都报告结果：
->
-> 1. 判断 AMS 版本：在 /atmosphere/package3 和 /atmosphere/stratosphere.romfs 里搜 ASCII 串 5388824b（= AMS 1.11.2，对应 bundle 1.1.0）和 28d6a2e1（= AMS 1.12.0，对应 bundle 1.2.0）。两个都搜不到就停手，说明系统版本不在补丁支持范围内。
-> 2. 看 /emuMMC/emummc.ini 里 enabled 是不是 1。不是 1 就停，这个补丁只对 emuMMC 有效。
-> 3. 看 /switch/fextendo-patch/FEXTendo-Patch.nro 在不在、大小是不是 5,892,099 字节。不在就传上去，不要拿别的 nro 顶替。
-> 4. 看 /bootloader/ini/ 下有没有 fextendo 相关条目。没有就是还没装——不要手写 ini，这一步必须我在 Switch 上跑安装器。
-> 5. 等我装完再连一次，你确认两件事：ini 条目出现了、条目里指向的 kip 文件真实存在；如果看到旧的 loader 备份，也告我一声。

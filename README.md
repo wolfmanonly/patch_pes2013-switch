@@ -2,17 +2,15 @@
 
 在 Switch 上通过 FEXTendo 兼容层跑 PC 版《实况足球 2013》，改比赛视角、边线清晰度。下面写的是具体改哪个文件、改成什么值。
 
-<img src="images/two-steps.png" width="430" alt="两步改法长图">
 
 适用环境：PES2013 1.00（`pes2013.exe` 19,969,024 字节）· FEXTendo 0.4.2（PES13-NX）· emuMMC
 
 两处改动都不在游戏数据包里：视角在 exe，边线在 dxvk.conf。
 
-本文不涉及引导层补丁（FEXTendo Patch）。游戏能跑起来的前提是已经装好它，那是作者 [Ibnuard/fextendo-core](https://github.com/Ibnuard/fextendo-core) 的东西，按它的 Releases 说明装即可，这里不展开。
 
 ## 不想手动改：跑脚本
 
-`patch_pes2013.py` 一个文件，不装第三方库，Python 3.8 以上直接跑。它做的就是下面第二节和第三节的事。
+`patch_pes2013.py` 一个文件，不装第三方库，Python 3.8 以上可用。不过更建议直接AI
 
 ```
 python patch_pes2013.py "F:\switch\pes13-fex"            直接改

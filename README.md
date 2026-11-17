@@ -1,12 +1,14 @@
-# PES2013 on Switch：改视角、边线、内存补丁
+# PES2013 on Switch：改视角与边线
 
-在 Switch 上通过 FEXTendo 兼容层跑 PC 版《实况足球 2013》，改比赛视角、边线清晰度，以及装 loader 内存补丁。下面写的是具体改哪个文件、改成什么值。
+在 Switch 上通过 FEXTendo 兼容层跑 PC 版《实况足球 2013》，改比赛视角、边线清晰度。下面写的是具体改哪个文件、改成什么值。
 
-<img src="images/three-steps.png" width="430" alt="三步改法长图">
+<img src="images/two-steps.png" width="430" alt="两步改法长图">
 
-适用环境：PES2013 1.00（`pes2013.exe` 19,969,024 字节）· FEXTendo 0.4.2（PES13-NX）· emuMMC · AMS 1.11.2 或 1.12.0
+适用环境：PES2013 1.00（`pes2013.exe` 19,969,024 字节）· FEXTendo 0.4.2（PES13-NX）· emuMMC
 
-三处改动都不在游戏数据包里：视角在 exe，边线在 dxvk.conf，内存补丁在 loader.kip。
+两处改动都不在游戏数据包里：视角在 exe，边线在 dxvk.conf。
+
+本文不涉及引导层补丁（FEXTendo Patch）。游戏能跑起来的前提是已经装好它，那是作者 [Ibnuard/fextendo-core](https://github.com/Ibnuard/fextendo-core) 的东西，按它的 Releases 说明装即可，这里不展开。
 
 ## 不想手动改：跑脚本
 
@@ -101,31 +103,13 @@ dxvk.numCompilerThreads = 1
 
 别记偏移（这一版是 `0x11c8ab0`，换 FEXTendo 版本就变），直接搜这串。搜到多处或者一处都搜不到，就停手别改。
 
-`pes13-fex.nro` 是游戏启动程序，跟前面装 loader 的 `FEXTendo-Patch.nro` 不是一回事，别搞混。
+`pes13-fex.nro` 是游戏启动程序（32 MB），不是装引导层补丁的 `FEXTendo-Patch.nro`，别搞混。
 
 ### 没效果的话
 
 先确认 AF 是 0。开着各向异性过滤时，LOD bias 从 −0.5 一路加到 −2.5 都看不出边线变化，因为 AF 会把 LOD 的效果平均回去。代价是轻微摩尔纹。
 
-## 四、内存补丁：FEXTendo Patch
-
-这不是游戏补丁，是引导层的。`pes2013.exe` 是 32 位程序，跑起来需要 Windows 式的低地址布局和一大块内存池，原版 Atmosphère 的 `loader.kip` 给不了，所以补丁就是换掉 `loader.kip`。顺带它还给 HIGH 画质档解锁。
-
-三个前提：
-
-- AMS 必须是 1.11.2（rev `5388824b`，对应 bundle 1.1.0）或 1.12.0（rev `28d6a2e1`，bundle 1.2.0）。其他版本 NRO 会报 `No matching bundle`。
-- 必须 emuMMC。
-- 以后每次要从 Hekate → `More configs` → `FEXTendo Patch (emuMMC)` 进，从普通虚拟系统入口进加载的还是原版 loader。
-
-步骤：
-
-1. `FEXTendo-Patch.nro`（5,892,099 字节）放到 `/switch/fextendo-patch/`。
-2. 如果还要升 AMS：`atmosphere/package3` 和 `stratosphere.romfs` 在系统运行时被占用，FTP 覆盖会报 550/450，得重启进 Hekate → `Tools` → `USB Mass Storage` 把 SD 挂成 U 盘再覆盖。`hbl.nsp` 没被占用，可以直接替。
-3. 进 emuMMC，相册启动这个 NRO，看到 `bundle 1.1.0 / Ready to install` 就确认。
-4. 装成的判据是 `/bootloader/ini/` 里出现 fextendo 条目。NRO 提示成功但 ini 没写进去是出现过的情况，所以别只看界面。
-5. 进游戏能选 High，说明补丁真的生效了。
-
-## 五、备份
+## 四、备份
 
 动手前先把这几个文件整份下载到电脑存一个目录：
 
@@ -133,15 +117,14 @@ dxvk.numCompilerThreads = 1
 - `pes13-fex.nro` 32,059,753 B
 - `launcher/renderers/dxvk-3.1.1/dxvk.conf` 250 B
 - `launcher/startup-verified.dat` 976 B
-- 要升 AMS 的话，再加上 `package3`、`stratosphere.romfs`、`hbl.nsp`
 
 传回卡之后整份回读 sha256，别只看大小。截断过的文件顶着正确文件名照样躺着，进游戏直接卡死，报错完全指不到原因。
 
 也可以让 AI 在每个文件的同目录 `cp` 一份 `.bak`，回滚时改回来比重下快。
 
-## 六、两段可以直接粘给 AI 的话
+## 五、可以直接粘给 AI 的话
 
-### 改视角和边线
+不懂怎么下手的话，把下面整段连地址一起发给能改文件的 AI，它会自己找位置：
 
 > 我的 Switch 用 DBI 开了 FTP：地址 192.168.x.x:5000，用户名 anonymous、密码空，根目录就是 SD 卡（sdmc:）。帮我改 PC 版 PES2013（1.00）的视角和边线，三个文件都在卡上：
 >
@@ -160,18 +143,6 @@ dxvk.numCompilerThreads = 1
 > b) 这份模板的 sha256 登记在 pes13-fex.nro 的目录表里，模板内容一改哈希就对不上，启动器直接判篡改。所以要在 nro 里搜那串 64 字节 ASCII 十六进制 98bc73015d742b34477466ba1d17cbbb42bad172a7c6fc06266c8eda86121d7d，整串替换成新模板的 sha256（同样 64 字节 ASCII）；nro 总大小不变，应只改动 63 个字节，搜到多处或搜不到就停手别改。
 >
 > 改完把三个文件传回卡，整份回读 sha256 与本地一致才算完。
-
-### 装内存补丁
-
-这一步 AI 只能做一半，装 `loader.kip` 得你在 Switch 上跑安装器。但版本对不对、文件在不在、ini 有没有写进去，可以让它先查清楚。
-
-> 还是刚才那个 DBI FTP 连接（192.168.x.x:5000，anonymous，根目录 = SD 卡）。帮我装 FEXTendo Patch（PES2013 兼容层的 loader 补丁）。只读优先，不确定的文件先备份再动，每一步都报告结果：
->
-> 1. 判断 AMS 版本：在 /atmosphere/package3 和 /atmosphere/stratosphere.romfs 里搜 ASCII 串 5388824b（= AMS 1.11.2，对应 bundle 1.1.0）和 28d6a2e1（= AMS 1.12.0，对应 bundle 1.2.0）。两个都搜不到就停手，说明系统版本不在补丁支持范围内。
-> 2. 看 /emuMMC/emummc.ini 里 enabled 是不是 1。不是 1 就停，这个补丁只对 emuMMC 有效。
-> 3. 看 /switch/fextendo-patch/FEXTendo-Patch.nro 在不在、大小是不是 5,892,099 字节。不在就传上去，不要拿别的 nro 顶替。
-> 4. 看 /bootloader/ini/ 下有没有 fextendo 相关条目。没有就是还没装——不要手写 ini，这一步必须我在 Switch 上跑安装器。
-> 5. 等我装完再连一次，你确认两件事：ini 条目出现了、条目里指向的 kip 文件真实存在；如果看到旧的 loader 备份，也告我一声。
 
 ## 说明
 
